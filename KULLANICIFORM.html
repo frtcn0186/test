@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏥 Arıza Bildir - Kahramankazan Hastanesi</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            max-width: 550px;
+            width: 100%;
+            padding: 40px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+        input[type="text"],
+        input[type="tel"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus,
+        input[type="tel"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+        .radio-group, .checkbox-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .radio-item, .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        input[type="radio"],
+        input[type="checkbox"] {
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+        .radio-item label,
+        .checkbox-item label {
+            margin: 0;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .char-counter {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+        .char-counter.warning {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            animation: slideIn 0.3s ease-out;
+        }
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .success-content {
+            text-align: center;
+        }
+        .talep-no-box {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+        }
+        .talep-no-box .label {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        .talep-no-box .number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            letter-spacing: 3px;
+        }
+        .copy-btn {
+            background: #28a745;
+            padding: 10px 20px;
+            width: auto;
+            margin: 10px auto;
+            display: block;
+        }
+        .copy-btn:hover {
+            background: #218838;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Donanım Arıza Bildirimi</h1>
+            <p>Kahramankazan Devlet Hastanesi - Bilgi İşlem</p>
+        </div>
+
+        <div id="messageContainer"></div>
+        <div id="successContainer"></div>
+
+        <form id="arizaForm">
+            <div class="form-group">
+                <label for="adSoyad" class="required">Ad Soyadı</label>
+                <input type="text" id="adSoyad" required placeholder="Adınız ve Soyadınız">
+            </div>
+
+            <div class="form-group">
+                <label for="telefon" class="required">Telefon Numarası</label>
+                <input type="tel" id="telefon" required placeholder="534 XXX XX XX">
+            </div>
+
+            <div class="form-group">
+                <label class="required">Lokasyon</label>
+                <div class="radio-group">
+                    <div class="radio-item">
+                        <input type="radio" id="anaB" name="lokasyon" value="Ana Bina" required>
+                        <label for="anaB">📍 Ana Bina</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" id="ekB" name="lokasyon" value="Ek Bina" required>
+                        <label for="ekB">📍 Ek Bina</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="birim" class="required">Birim</label>
+                <input type="text" id="birim" required placeholder="Örn: KBB POL.1">
+            </div>
+
+            <div class="form-group">
+                <label class="required">Arıza Sistemi (Birden fazla seçebilirsiniz)</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="bilgisayar" name="arizaSistemi" value="Bilgisayar">
+                        <label for="bilgisayar">💻 Bilgisayar</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="hemsis" name="arizaSistemi" value="Hemşire Çağrı S.">
+                        <label for="hemsis">📞 Hemşire Çağrı S.</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="kamera" name="arizaSistemi" value="Kamera">
+                        <label for="kamera">📹 Kamera</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="diger" name="arizaSistemi" value="Diğer">
+                        <label for="diger">🔧 Diğer</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="aciklama" class="required">Arıza Açıklaması</label>
+                <textarea id="aciklama" required placeholder="Arızanın detaylı açıklamasını yazınız (Max. 160 karakter)"></textarea>
+                <div class="char-counter"><span id="charCount">0</span>/160</div>
+            </div>
+
+            <button type="submit">📤 Arıza Bildirimi Gönder</button>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Lütfen bekleyiniz...</p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // GAS Web App URL'si (BURAYA DEPLOY EDİLMİŞ URL'Yİ YAZ)
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbw4ENjCbGy6fSc4_12Mthr1hqhF_KoQ9BZp0CN6FMMETExJ9bCDDO8d5XbaTbfagTx-/exec";
+
+        const form = document.getElementById('arizaForm');
+        const messageContainer = document.getElementById('messageContainer');
+        const successContainer = document.getElementById('successContainer');
+        const aciklamaInput = document.getElementById('aciklama');
+        const charCountDisplay = document.getElementById('charCount');
+        const loading = document.getElementById('loading');
+
+        // Karakter sayacı
+        aciklamaInput.addEventListener('input', function() {
+            const length = this.value.length;
+            charCountDisplay.textContent = length;
+            
+            if (length > 160) {
+                this.value = this.value.substring(0, 160);
+                charCountDisplay.textContent = 160;
+                document.querySelector('.char-counter').classList.add('warning');
+            } else {
+                document.querySelector('.char-counter').classList.remove('warning');
+            }
+        });
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Validasyon
+            const adSoyad = document.getElementById('adSoyad').value.trim();
+            const telefon = document.getElementById('telefon').value.trim();
+            const lokasyon = document.querySelector('input[name="lokasyon"]:checked')?.value;
+            const birim = document.getElementById('birim').value.trim();
+            const arizaSistemi = Array.from(document.querySelectorAll('input[name="arizaSistemi"]:checked')).map(cb => cb.value).join(', ');
+            const aciklama = aciklamaInput.value.trim();
+
+            // Hata kontrolleri
+            if (!adSoyad) {
+                showMessage('❌ Ad Soyadı boş bırakılamaz!', 'error');
+                return;
+            }
+            if (!telefon) {
+                showMessage('❌ Telefon numarası boş bırakılamaz!', 'error');
+                return;
+            }
+            if (!lokasyon) {
+                showMessage('❌ Lütfen bir lokasyon seçiniz!', 'error');
+                return;
+            }
+            if (!birim) {
+                showMessage('❌ Birim boş bırakılamaz!', 'error');
+                return;
+            }
+            if (!arizaSistemi) {
+                showMessage('❌ Lütfen en az bir arıza sistemi seçiniz!', 'error');
+                return;
+            }
+            if (!aciklama) {
+                showMessage('❌ Açıklama boş bırakılamaz!', 'error');
+                return;
+            }
+            if (aciklama.length > 160) {
+                showMessage('❌ Açıklama 160 karakterden uzun olamaz!', 'error');
+                return;
+            }
+
+            // Gönderme
+            loading.style.display = 'block';
+            messageContainer.innerHTML = '';
+
+            try {
+                const formDataObj = {
+                    adSoyad: adSoyad,
+                    telefon: telefon,
+                    lokasyon: lokasyon,
+                    birim: birim,
+                    arizaSistemi: arizaSistemi,
+                    aciklama: aciklama
+                };
+
+                const response = await fetch(GAS_URL + "?action=submitForm", {
+                    method: "POST",
+                    mode: "cors",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(formDataObj)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                handleResponse(result);
+
+            } catch (error) {
+                loading.style.display = 'none';
+                showMessage('❌ Ağ Hatası: ' + error.message, 'error');
+            }
+        });
+
+        function handleResponse(response) {
+            loading.style.display = 'none';
+
+            if (response.success) {
+                form.style.display = 'none';
+                successContainer.innerHTML = `
+                    <div class="message success">
+                        <div class="success-content">
+                            <h2>✅ Başarılı!</h2>
+                            <p>${response.message}</p>
+                            <div class="talep-no-box">
+                                <div class="label">Takip Numaranız:</div>
+                                <div class="number">${response.talepNo}</div>
+                            </div>
+                            <button class="copy-btn" onclick="copyToClipboard('${response.talepNo}')">📋 Takip Numasını Kopyala</button>
+                            <p style="margin-top: 15px; font-size: 13px; color: #666;">
+                                ⚠️ <strong>Lütfen bu takip numasını kaydediniz!</strong><br>
+                                Arızanızın durumunu sorgularken ihtiyacınız olacak.
+                            </p>
+                            <button onclick="location.reload()" style="background: #6c757d; margin-top: 15px;">🔄 Yeni Arıza Bildirimi</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                showMessage(response.error, 'error');
+                if (response.details) {
+                    console.error('Detay:', response.details);
+                }
+            }
+        }
+
+        function showMessage(message, type) {
+            messageContainer.innerHTML = `<div class="message ${type}">${message}</div>`;
+            messageContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ Takip numarası panoya kopyalandı!');
+            }).catch(err => {
+                console.error('Kopyalama hatası:', err);
+            });
+        }
+    </script>
+</body>
+</html>
