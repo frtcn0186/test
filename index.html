@@ -3,428 +3,746 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏥 Arıza Bildir - Kahramankazan Hastanesi</title>
+    <title>KDH Envanter Kayıt Sistemi</title>
+    <link rel='icon' type='image/png' sizes='32x32' href='https://raw.githubusercontent.com/frtcn0186/ENVANTER/refs/heads/main/favicon-32x32.png'>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            max-width: 550px;
+
+        #mainContainer {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
             width: 100%;
             padding: 40px;
+            animation: fadeIn 0.5s ease-in;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
+
         .header h1 {
             color: #667eea;
-            font-size: 28px;
-            margin-bottom: 5px;
+            font-size: clamp(24px, 5vw, 36px);
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .header p {
-            color: #666;
-            font-size: 14px;
+
+        .header .subtitle {
+            color: #6b7280;
+            font-size: clamp(14px, 3vw, 16px);
+            font-weight: 500;
         }
+
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .selection-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 16px;
+            padding: 40px 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .selection-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .selection-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.5);
+        }
+
+        .selection-card:hover::before {
+            opacity: 1;
+        }
+
+        .selection-card.yazici {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 8px 20px rgba(245, 87, 108, 0.3);
+        }
+
+        .selection-card.yazici:hover {
+            box-shadow: 0 12px 30px rgba(245, 87, 108, 0.5);
+        }
+
+        .selection-card .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .selection-card .title {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        .form-container {
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-header h1 {
+            font-size: clamp(20px, 4vw, 28px);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .form-header .icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
         .form-group {
             margin-bottom: 20px;
         }
-        label {
+
+        .form-group label {
             display: block;
-            margin-bottom: 8px;
-            color: #333;
             font-weight: 600;
+            margin-bottom: 8px;
+            color: #374151;
             font-size: 14px;
+            letter-spacing: 0.3px;
         }
-        .required::after {
-            content: " *";
-            color: #e74c3c;
+
+        .form-group label .required {
+            color: #ef4444;
         }
+
+        .form-group label .column-info {
+            color: #9ca3af;
+            font-weight: 400;
+            font-size: 12px;
+        }
+
+        /* Input Container with Scan Button */
+        .input-with-scan {
+            position: relative;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .input-with-scan input {
+            flex: 1;
+        }
+
+        .scan-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 48px;
+            height: 48px;
+        }
+
+        .scan-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+        }
+
+        .scan-button:active {
+            transform: translateY(0);
+        }
+
+        .scan-button svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
         input[type="text"],
-        input[type="tel"],
+        input[type="number"],
+        input[type="date"],
+        select,
         textarea {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
             font-size: 14px;
             font-family: inherit;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
+            background: white;
         }
+
         input[type="text"]:focus,
-        input[type="tel"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        select:focus,
         textarea:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
         }
-        .radio-group, .checkbox-group {
-            display: flex;
-            gap: 15px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
-        .radio-item, .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        input[type="radio"],
-        input[type="checkbox"] {
-            cursor: pointer;
-            accent-color: #667eea;
-        }
-        .radio-item label,
-        .checkbox-item label {
-            margin: 0;
-            font-weight: 500;
-            cursor: pointer;
-        }
+
         textarea {
             resize: vertical;
             min-height: 80px;
         }
-        .char-counter {
-            font-size: 12px;
-            color: #999;
-            margin-top: 4px;
+
+        .diger-marka-input {
+            margin-top: 10px;
+            animation: slideDown 0.3s ease-out;
         }
-        .char-counter.warning {
-            color: #e74c3c;
-            font-weight: bold;
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        button {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+
+        .btn {
+            padding: 14px 28px;
             border: none;
-            border-radius: 6px;
+            border-radius: 12px;
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            width: 100%;
             margin-top: 10px;
         }
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
-        button:disabled {
-            opacity: 0.6;
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-primary:disabled {
+            background: #9ca3af;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
-        .message {
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            animation: slideIn 0.3s ease-out;
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+            box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3);
         }
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+
+        .btn-secondary:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
         }
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .success-content {
+
+        .sonucMesaji {
+            margin-top: 20px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-weight: 600;
             text-align: center;
+            animation: popIn 0.3s ease-out;
+            display: none;
         }
-        .talep-no-box {
-            background: #f0f0f0;
-            padding: 15px;
-            border-radius: 6px;
-            margin: 15px 0;
-            text-align: center;
-            font-family: 'Courier New', monospace;
-        }
-        .talep-no-box .label {
-            color: #666;
-            font-size: 12px;
-            margin-bottom: 5px;
-        }
-        .talep-no-box .number {
-            font-size: 32px;
-            font-weight: bold;
-            color: #667eea;
-            letter-spacing: 3px;
-        }
-        .copy-btn {
-            background: #28a745;
-            padding: 10px 20px;
-            width: auto;
-            margin: 10px auto;
+
+        .sonucMesaji.active {
             display: block;
         }
-        .copy-btn:hover {
-            background: #218838;
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
         }
+
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid #6ee7b7;
+        }
+
+        .failure {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 2px solid #fca5a5;
+        }
+
         .loading {
-            display: none;
+            background: #dbeafe;
+            color: #1e40af;
+            border: 2px solid #93c5fd;
+        }
+
+        .info-text {
             text-align: center;
-            margin: 20px 0;
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 15px;
+            font-style: italic;
         }
+
+        @media (max-width: 768px) {
+            #mainContainer {
+                padding: 25px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .selection-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            #mainContainer {
+                padding: 20px;
+                border-radius: 16px;
+            }
+
+            .btn {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+        }
+
         .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255,255,255,.3);
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
         }
+
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🏥 Donanım Arıza Bildirimi</h1>
-            <p>Kahramankazan Devlet Hastanesi - Bilgi İşlem</p>
+    <div id="mainContainer">
+        
+        <!-- ANA SAYFA -->
+        <div id="anaSayfa">
+            <div class="header">
+                <h1>🏥 KAHRAMANKAZAN DEVLET HASTANESİ Envanter Sistemi</h1>
+                <p class="subtitle">Modern ve Güvenli Envanter Kayıt Platformu</p>
+            </div>
+            
+            <div class="selection-grid">
+                <button class="selection-card bilgisayar" onclick="showForm('bilgisayar')">
+                    <span class="icon">💻</span>
+                    <div class="title">Bilgisayar Envanteri</div>
+                </button>
+                <button class="selection-card yazici" onclick="showForm('yazici')">
+                    <span class="icon">🖨️</span>
+                    <div class="title">Yazıcı / Barkod Envanteri</div>
+                </button>
+            </div>
         </div>
 
-        <div id="messageContainer"></div>
-        <div id="successContainer"></div>
-
-        <form id="arizaForm">
-            <div class="form-group">
-                <label for="adSoyad" class="required">Ad Soyadı</label>
-                <input type="text" id="adSoyad" required placeholder="Adınız ve Soyadınız">
+        <!-- BİLGİSAYAR FORMU -->
+        <div id="bilgisayarFormuContainer" style="display:none;" class="form-container">
+            <div class="form-header">
+                <span class="icon">💻</span>
+                <h1>Bilgisayar Envanter Kayıt Formu</h1>
             </div>
-
-            <div class="form-group">
-                <label for="telefon" class="required">Telefon Numarası</label>
-                <input type="tel" id="telefon" required placeholder="534 XXX XX XX">
-            </div>
-
-            <div class="form-group">
-                <label class="required">Lokasyon</label>
-                <div class="radio-group">
-                    <div class="radio-item">
-                        <input type="radio" id="anaB" name="lokasyon" value="Ana Bina" required>
-                        <label for="anaB">📍 Ana Bina</label>
+            
+            <form id="bilgisayarForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>BULUNDUĞU YER <span class="required">*</span> <span class="column-info">(A Sütunu)</span></label>
+                        <input type="text" id="bulundugu_yer" name="bulundugu_yer" required placeholder="Örn: 2. Kat / 205 Nolu Oda">
                     </div>
-                    <div class="radio-item">
-                        <input type="radio" id="ekB" name="lokasyon" value="Ek Bina" required>
-                        <label for="ekB">📍 Ek Bina</label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="birim" class="required">Birim</label>
-                <input type="text" id="birim" required placeholder="Örn: KBB POL.1">
-            </div>
-
-            <div class="form-group">
-                <label class="required">Arıza Sistemi (Birden fazla seçebilirsiniz)</label>
-                <div class="checkbox-group">
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="bilgisayar" name="arizaSistemi" value="Bilgisayar">
-                        <label for="bilgisayar">💻 Bilgisayar</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="hemsis" name="arizaSistemi" value="Hemşire Çağrı S.">
-                        <label for="hemsis">📞 Hemşire Çağrı S.</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="kamera" name="arizaSistemi" value="Kamera">
-                        <label for="kamera">📹 Kamera</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="diger" name="arizaSistemi" value="Diğer">
-                        <label for="diger">🔧 Diğer</label>
+                    <div class="form-group">
+                        <label>DEMİRBAŞ NUMARASI <span class="required">*</span> <span class="column-info">(E Sütunu)</span></label>
+                        <div class="input-with-scan">
+                            <input type="text" id="demirbas_numarasi" name="demirbas_numarasi" required placeholder="Örn: E123456" maxlength="15">
+                            <button type="button" class="scan-button" onclick="openScanner('demirbas_numarasi')" title="Barkod Tara">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M4 4h4v4H4V4m6 0h2v4h-2V4m4 0h4v4h-4V4M4 10h2v4H4v-4m6 0h2v4h-2v-4m6 0h2v4h-2v-4m4 0h4v4h-4v-4M4 16h4v4H4v-4m6 0h2v4h-2v-4m4 0h4v4h-4v-4z"/>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label for="aciklama" class="required">Arıza Açıklaması</label>
-                <textarea id="aciklama" required placeholder="Arızanın detaylı açıklamasını yazınız (Max. 160 karakter)"></textarea>
-                <div class="char-counter"><span id="charCount">0</span>/160</div>
-            </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>MARKA <span class="required">*</span> <span class="column-info">(B Sütunu)</span></label>
+                        <select id="marka" name="marka" required onchange="checkOtherBrand(this.value)">
+                            <option value="">Lütfen Seçiniz</option>
+                            <option value="DELL">DELL</option>
+                            <option value="HP">HP</option>
+                            <option value="TECHNOPC">TECHNOPC</option>
+                            <option value="ACER">ACER</option>
+                            <option value="FUJİTSU">FUJİTSU</option>
+                            <option value="LENOVO">LENOVO</option>
+                            <option value="DİĞER">DİĞER</option>
+                        </select>
+                        <input type="text" id="marka_diger" name="marka_diger" class="diger-marka-input" placeholder="Marka Adını Belirtiniz" style="display: none;">
+                    </div>
+                    <div class="form-group">
+                        <label>MODEL <span class="required">*</span> <span class="column-info">(C Sütunu)</span></label>
+                        <input type="text" id="model" name="model" required placeholder="Örn: OptiPlex 3080">
+                    </div>
+                </div>
 
-            <button type="submit">📤 Arıza Bildirimi Gönder</button>
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Lütfen bekleyiniz...</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>SERİ NO <span class="column-info">(D Sütunu)</span></label>
+                        <div class="input-with-scan">
+                            <input type="text" id="seri" name="seri" placeholder="Seri Numarası">
+                            <button type="button" class="scan-button" onclick="openScanner('seri')" title="Barkod Tara">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M4 4h4v4H4V4m6 0h2v4h-2V4m4 0h4v4h-4V4M4 10h2v4H4v-4m6 0h2v4h-2v-4m6 0h2v4h-2v-4m4 0h4v4h-4v-4M4 16h4v4H4v-4m6 0h2v4h-2v-4m4 0h4v4h-4v-4z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>İŞLETİM SİSTEMİ <span class="required">*</span> <span class="column-info">(F Sütunu)</span></label>
+                        <select id="isletim_sistemi" name="isletim_sistemi" required>
+                            <option value="">Lütfen Seçiniz</option>
+                            <option value="WİN 11">Windows 11</option>
+                            <option value="WİN 10">Windows 10</option>
+                            <option value="WİN 8">Windows 8</option>
+                            <option value="WİN 7">Windows 7</option>
+                            <option value="DİĞER/YOK">Diğer / Yok</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>İŞLEMÇİ <span class="column-info">(G Sütunu)</span></label>
+                        <input type="text" id="islemci" name="islemci" placeholder="Örn: Intel i5 10. Nesil">
+                    </div>
+                    <div class="form-group">
+                        <label>RAM <span class="column-info">(K Sütunu)</span></label>
+                        <input type="text" id="ram" name="ram" placeholder="Örn: 8GB DDR4">
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>EK AKSAMLAR <span class="column-info">(H Sütunu)</span></label>
+                        <input type="text" id="ek_aksamlar" name="ek_aksamlar" placeholder="Örn: 24' Monitör, Klavye, Mouse">
+                    </div>
+                    <div class="form-group">
+                        <label>IP ADRESİ <span class="column-info">(L Sütunu)</span></label>
+                        <input type="text" id="ip" name="ip" placeholder="Örn: 192.168.1.100">
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>ALINMA TARİHİ <span class="column-info">(I Sütunu)</span></label>
+                        <input type="date" id="alinma_tarihi" name="alinma_tarihi">
+                    </div>
+                    <div class="form-group">
+                        <label>GARANTİ BİLGİSİ <span class="column-info">(J Sütunu)</span></label>
+                        <input type="text" id="garanti" name="garanti" placeholder="Örn: Var, 2026/05">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>AÇIKLAMA <span class="column-info">(N Sütunu - Maks. 160 Karakter)</span></label>
+                    <textarea id="aciklama" name="aciklama" placeholder="Ek notlar, arıza bilgileri veya önemli güncellemeler..." maxlength="160"></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" id="bilgisayarSubmitButton">
+                    💾 Bilgisayar Kaydını Tamamla
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="showForm('ana')">
+                    ← Ana Sayfaya Dön
+                </button>
+                
+                <p class="info-text">* Kayıt Tarihi (M Sütunu) otomatik olarak eklenecektir</p>
+            </form>
+            
+            <div id="bilgisayarSonucMesaji" class="sonucMesaji"></div>
+        </div>
+
+        <!-- YAZICI FORMU -->
+        <div id="yaziciFormuContainer" style="display:none;" class="form-container">
+            <div class="form-header" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <span class="icon">🖨️</span>
+                <h1>Yazıcı / Barkod Envanter Kayıt Formu</h1>
             </div>
-        </form>
+            
+            <form id="yaziciForm">
+                <div class="form-group">
+                    <label>CİHAZ TÜRÜ <span class="required">*</span> <span class="column-info">(A Sütunu)</span></label>
+                    <select id="alt_cihaz_turu" name="alt_cihaz_turu" required>
+                        <option value="">Lütfen Seçiniz</option>
+                        <option value="Yazıcı">Yazıcı</option>
+                        <option value="Barkod Cihazı">Barkod Okuyucu</option>
+                        <option value="Diğer">Diğer Çevre Birimi</option>
+                    </select>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>SERİ NUMARASI <span class="required">*</span> <span class="column-info">(B Sütunu)</span></label>
+                        <div class="input-with-scan">
+                            <input type="text" id="yazici_seri_no" name="yazici_seri_no" required placeholder="Cihazın Seri Numarası" maxlength="30">
+                            <button type="button" class="scan-button" onclick="openScanner('yazici_seri_no')" title="Barkod Tara">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M4 4h4v4H4V4m6 0h2v4h-2V4m4 0h4v4h-4V4M4 10h2v4H4v-4m6 0h2v4h-2v-4m6 0h2v4h-2v-4m4 0h4v4h-4v-4M4 16h4v4H4v-4m6 0h2v4h-2v-4m4 0h4v4h-4v-4z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>BULUNDUĞU YER <span class="required">*</span> <span class="column-info">(C Sütunu)</span></label>
+                        <input type="text" id="yazici_bulundugu_yer" name="yazici_bulundugu_yer" required placeholder="Örn: Zemin Kat / Resepsiyon">
+                    </div>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>MARKA <span class="required">*</span> <span class="column-info">(D Sütunu)</span></label>
+                        <input type="text" id="yazici_marka" name="yazici_marka" required placeholder="Örn: HP, Canon, Epson, Zebra">
+                    </div>
+                    <div class="form-group">
+                        <label>MODEL <span class="required">*</span> <span class="column-info">(E Sütunu)</span></label>
+                        <input type="text" id="yazici_model" name="yazici_model" required placeholder="Örn: LaserJet Pro M404dn">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>AÇIKLAMA <span class="column-info">(F Sütunu - Maks. 160 Karakter)</span></label>
+                    <textarea id="yazici_aciklama" name="yazici_aciklama" placeholder="Durum notları, bakım bilgileri, arıza kayıtları..." maxlength="160"></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" id="yaziciSubmitButton" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    💾 Yazıcı Kaydını Tamamla
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="showForm('ana')">
+                    ← Ana Sayfaya Dön
+                </button>
+                
+                <p class="info-text">* Kayıt Tarihi (H Sütunu) otomatik olarak eklenecektir</p>
+            </form>
+            
+            <div id="yaziciSonucMesaji" class="sonucMesaji"></div>
+        </div>
+        
     </div>
 
     <script>
-        // GAS Web App URL'si (BURAYA DEPLOY EDİLMİŞ URL'Yİ YAZ)
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbw4ENjCbGy6fSc4_12Mthr1hqhF_KoQ9BZp0CN6FMMETExJ9bCDDO8d5XbaTbfagTx-/exec";
+        const BILGISAYAR_DGS_URL = "https://script.google.com/macros/s/AKfycbwOOUSX48j-62MsDpdxuOmTHcQxAYzuFAgPfsf0D7GCJablwbQcyy72XPPEPqVStcOA/exec"; 
+        const YAZICI_DGS_URL = "https://script.google.com/macros/s/AKfycbxsh52Y5s8G0oPlgJeXbXpCSVxYZp2Mi36DJpxACp7xPVeofJLV_vCQ0BVWuVzdi5Bn/exec"; 
+        
+        function showForm(formType) {
+            document.getElementById('anaSayfa').style.display = 'none';
+            document.getElementById('bilgisayarFormuContainer').style.display = 'none';
+            document.getElementById('yaziciFormuContainer').style.display = 'none';
 
-        const form = document.getElementById('arizaForm');
-        const messageContainer = document.getElementById('messageContainer');
-        const successContainer = document.getElementById('successContainer');
-        const aciklamaInput = document.getElementById('aciklama');
-        const charCountDisplay = document.getElementById('charCount');
-        const loading = document.getElementById('loading');
-
-        // Karakter sayacı
-        aciklamaInput.addEventListener('input', function() {
-            const length = this.value.length;
-            charCountDisplay.textContent = length;
-            
-            if (length > 160) {
-                this.value = this.value.substring(0, 160);
-                charCountDisplay.textContent = 160;
-                document.querySelector('.char-counter').classList.add('warning');
+            if (formType === 'bilgisayar') {
+                document.getElementById('bilgisayarFormuContainer').style.display = 'block';
+            } else if (formType === 'yazici') {
+                document.getElementById('yaziciFormuContainer').style.display = 'block';
             } else {
-                document.querySelector('.char-counter').classList.remove('warning');
+                document.getElementById('anaSayfa').style.display = 'block';
             }
-        });
-
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
             
-            // Validasyon
-            const adSoyad = document.getElementById('adSoyad').value.trim();
-            const telefon = document.getElementById('telefon').value.trim();
-            const lokasyon = document.querySelector('input[name="lokasyon"]:checked')?.value;
-            const birim = document.getElementById('birim').value.trim();
-            const arizaSistemi = Array.from(document.querySelectorAll('input[name="arizaSistemi"]:checked')).map(cb => cb.value).join(', ');
-            const aciklama = aciklamaInput.value.trim();
-
-            // Hata kontrolleri
-            if (!adSoyad) {
-                showMessage('❌ Ad Soyadı boş bırakılamaz!', 'error');
-                return;
-            }
-            if (!telefon) {
-                showMessage('❌ Telefon numarası boş bırakılamaz!', 'error');
-                return;
-            }
-            if (!lokasyon) {
-                showMessage('❌ Lütfen bir lokasyon seçiniz!', 'error');
-                return;
-            }
-            if (!birim) {
-                showMessage('❌ Birim boş bırakılamaz!', 'error');
-                return;
-            }
-            if (!arizaSistemi) {
-                showMessage('❌ Lütfen en az bir arıza sistemi seçiniz!', 'error');
-                return;
-            }
-            if (!aciklama) {
-                showMessage('❌ Açıklama boş bırakılamaz!', 'error');
-                return;
-            }
-            if (aciklama.length > 160) {
-                showMessage('❌ Açıklama 160 karakterden uzun olamaz!', 'error');
-                return;
-            }
-
-            // Gönderme
-            loading.style.display = 'block';
-            messageContainer.innerHTML = '';
-
-            try {
-                const formDataObj = {
-                    adSoyad: adSoyad,
-                    telefon: telefon,
-                    lokasyon: lokasyon,
-                    birim: birim,
-                    arizaSistemi: arizaSistemi,
-                    aciklama: aciklama
-                };
-
-                const response = await fetch(GAS_URL + "?action=submitForm", {
-                    method: "POST",
-                    mode: "cors",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(formDataObj)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const result = await response.json();
-                handleResponse(result);
-
-            } catch (error) {
-                loading.style.display = 'none';
-                showMessage('❌ Ağ Hatası: ' + error.message, 'error');
-            }
-        });
-
-        function handleResponse(response) {
-            loading.style.display = 'none';
-
-            if (response.success) {
-                form.style.display = 'none';
-                successContainer.innerHTML = `
-                    <div class="message success">
-                        <div class="success-content">
-                            <h2>✅ Başarılı!</h2>
-                            <p>${response.message}</p>
-                            <div class="talep-no-box">
-                                <div class="label">Takip Numaranız:</div>
-                                <div class="number">${response.talepNo}</div>
-                            </div>
-                            <button class="copy-btn" onclick="copyToClipboard('${response.talepNo}')">📋 Takip Numasını Kopyala</button>
-                            <p style="margin-top: 15px; font-size: 13px; color: #666;">
-                                ⚠️ <strong>Lütfen bu takip numasını kaydediniz!</strong><br>
-                                Arızanızın durumunu sorgularken ihtiyacınız olacak.
-                            </p>
-                            <button onclick="location.reload()" style="background: #6c757d; margin-top: 15px;">🔄 Yeni Arıza Bildirimi</button>
-                        </div>
-                    </div>
-                `;
-            } else {
-                showMessage(response.error, 'error');
-                if (response.details) {
-                    console.error('Detay:', response.details);
-                }
-            }
-        }
-
-        function showMessage(message, type) {
-            messageContainer.innerHTML = `<div class="message ${type}">${message}</div>`;
-            messageContainer.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                alert('✅ Takip numarası panoya kopyalandı!');
-            }).catch(err => {
-                console.error('Kopyalama hatası:', err);
+            document.querySelectorAll('.sonucMesaji').forEach(el => {
+                el.textContent = '';
+                el.classList.remove('active', 'success', 'failure', 'loading');
             });
         }
+        
+        showForm('ana'); 
+
+        // Barkod Tarayıcı Açma Fonksiyonu
+        function openScanner(inputId) {
+            if (typeof Android !== 'undefined' && Android.openBarcodeScanner) {
+                Android.openBarcodeScanner(inputId);
+            } else {
+                alert('Bu özellik sadece mobil uygulamada çalışır.');
+            }
+        }
+
+        function checkOtherBrand(value) {
+            const digerInput = document.getElementById('marka_diger');
+            digerInput.style.display = (value === 'DİĞER') ? 'block' : 'none';
+            digerInput.required = (value === 'DİĞER');
+            if (value !== 'DİĞER') {
+                digerInput.value = ''; 
+            }
+        }
+
+        document.getElementById('bilgisayarForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); 
+            const form = e.target;
+            const submitButton = document.getElementById('bilgisayarSubmitButton');
+            const sonucMesaji = document.getElementById('bilgisayarSonucMesaji');
+            const formData = new FormData(form);
+
+            if(!form.checkValidity() || (formData.get('marka') === 'DİĞER' && !formData.get('marka_diger'))) {
+                sonucMesaji.textContent = "❌ Lütfen tüm zorunlu alanları eksiksiz doldurunuz!";
+                sonucMesaji.className = 'sonucMesaji failure active';
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="spinner"></span> Kaydediliyor...';
+            sonucMesaji.textContent = "⚙️ Verileriniz Google Sheets'e aktarılıyor...";
+            sonucMesaji.className = 'sonucMesaji loading active';
+
+            try {
+                const response = await fetch(BILGISAYAR_DGS_URL, {
+                    method: 'POST',
+                    body: formData,
+                    mode: 'no-cors' 
+                });
+                
+                sonucMesaji.textContent = "✅ Bilgisayar kaydı başarıyla tamamlandı! Google Sheets'i kontrol edebilirsiniz.";
+                sonucMesaji.className = 'sonucMesaji success active';
+                
+                form.reset(); 
+                checkOtherBrand(''); 
+
+            } catch (error) {
+                sonucMesaji.textContent = "❌ Bağlantı hatası! Lütfen URL'yi kontrol edin ve tekrar deneyin.";
+                sonucMesaji.className = 'sonucMesaji failure active';
+                console.error('Hata:', error);
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = '💾 Bilgisayar Kaydını Tamamla';
+            }
+        });
+
+        document.getElementById('yaziciForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); 
+            const form = e.target;
+            const submitButton = document.getElementById('yaziciSubmitButton');
+            const sonucMesaji = document.getElementById('yaziciSonucMesaji');
+            const formData = new FormData(form);
+
+            if(!form.checkValidity()) {
+                sonucMesaji.textContent = "❌ Lütfen tüm zorunlu (*) alanları doldurunuz!";
+                sonucMesaji.className = 'sonucMesaji failure active';
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="spinner"></span> Kaydediliyor...';
+            sonucMesaji.textContent = "⚙️ Verileriniz Google Sheets'e aktarılıyor...";
+            sonucMesaji.className = 'sonucMesaji loading active';
+
+            try {
+                const response = await fetch(YAZICI_DGS_URL, {
+                    method: 'POST',
+                    body: formData,
+                });
+                
+                const text = await response.text();
+                let data;
+                
+                try {
+                    data = JSON.parse(text);
+                } catch (e) { 
+                    data = { result: 'success' };
+                }
+
+                if (data.result === 'error') {
+                    sonucMesaji.textContent = `❌ Kayıt başarısız: ${data.message}`;
+                    sonucMesaji.className = 'sonucMesaji failure active';
+                } else {
+                    sonucMesaji.textContent = "✅ Yazıcı kaydı başarıyla tamamlandı! Google Sheets'i kontrol edebilirsiniz.";
+                    sonucMesaji.className = 'sonucMesaji success active';
+                    form.reset(); 
+                }
+            } catch (error) {
+                sonucMesaji.textContent = "❌ Bağlantı hatası! Lütfen URL'yi kontrol edin.";
+                sonucMesaji.className = 'sonucMesaji failure active';
+                console.error('Hata:', error);
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = '💾 Yazıcı Kaydını Tamamla';
+            }
+        });
     </script>
 </body>
-</html>
+</html
